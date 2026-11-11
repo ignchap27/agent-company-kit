@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.agent-company.dispatch</string>
+  <!-- zsh -l para heredar tu PATH (claude, gh, jq). -->
+  <key>ProgramArguments</key>
+  <array><string>/bin/zsh</string><string>-lc</string><string>~/.claude/agent-company/dispatch.sh</string></array>
+  <key>StartInterval</key><integer>600</integer>
+  <key>RunAtLoad</key><true/>
+  <!-- Sin esto launchd mata al acabar cada pasada lo que levantó start.sh (oficina y tablero). -->
+  <key>AbandonProcessGroup</key><true/>
+  <key>StandardOutPath</key><string>/tmp/agent-company-dispatch.log</string>
+  <key>StandardErrorPath</key><string>/tmp/agent-company-dispatch.log</string>
+</dict>
+</plist>

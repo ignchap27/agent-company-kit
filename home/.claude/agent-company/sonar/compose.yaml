@@ -1,0 +1,17 @@
+# SonarQube local para los agentes. Lo arranca sonar-scan.sh la primera vez que se necesita.
+services:
+  sonarqube:
+    image: sonarqube:26.10.0.133078-community
+    container_name: agent-company-sonarqube
+    ports: ["127.0.0.1:9000:9000"]
+    environment:
+      SONAR_TELEMETRY_ENABLE: "false"
+    volumes:
+      - sonar_data:/opt/sonarqube/data
+      - sonar_extensions:/opt/sonarqube/extensions
+      - sonar_logs:/opt/sonarqube/logs
+    restart: unless-stopped
+volumes:
+  sonar_data:
+  sonar_extensions:
+  sonar_logs:

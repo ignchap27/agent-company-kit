@@ -1,0 +1,51 @@
+{
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push -u origin HEAD)",
+      "Bash(git push origin HEAD)",
+      "Bash(gh issue *)",
+      "Bash(gh pr create *)",
+      "Bash(gh pr edit *)",
+      "Bash(gh pr ready *)",
+      "Bash(gh pr checks *)",
+      "Bash(gh pr view *)",
+      "Bash(gh run view *)",
+      "Bash(osascript -e *)",
+      "Bash(~/.claude/agent-company/merge-stacked.sh *)",
+      "Bash(~/.claude/agent-company/dispatch.sh)",
+      "Bash(~/.claude/agent-company/fetch-images.sh *)"
+    ],
+    "deny": [
+      "Bash(gh pr merge *)",
+      "Bash(gh pr review *)",
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(~/.claude/agent-company/sonar/token)",
+      "Read(~/.claude/agent-company/sonar/admin-password)"
+    ]
+  },
+  "modelSettings": {
+    "claude-sonnet-5-5": { "autoCompactWindow": 150000 }
+  },
+  "env": {
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "1"
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          { "type": "command", "command": "~/.claude/hooks/guard.sh", "timeout": 10 }
+        ]
+      }
+    ]
+  }
+}

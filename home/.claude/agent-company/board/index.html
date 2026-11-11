@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Company</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #14121f; --panel: #1d1a2c; --card: #262238; --line: #342f4a;
+    --text: #ece9f5; --muted: #9a94b3; --accent: #e76e74; --ok: #6cc596;
+    --warn: #e8b85a; --violet: #8b6fd6; --blue: #6f98d6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 Inter, system-ui, sans-serif; }
+  header { display: flex; align-items: baseline; gap: 16px; padding: 18px 24px 8px; flex-wrap: wrap; }
+  h1, h2, .col h3 { font-family: Silkscreen, monospace; font-weight: 400; letter-spacing: .02em; margin: 0; }
+  h1 { font-size: 22px; }
+  .updated { color: var(--muted); font-size: 12px; margin-left: auto; }
+  main { padding: 8px 24px 24px; display: grid; gap: 20px; }
+  .group { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; }
+  .group-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+  h2 { font-size: 15px; }
+  .repo { color: var(--muted); font-size: 12px; }
+  .progress { flex: 1; min-width: 140px; max-width: 320px; height: 10px; background: var(--card); border-radius: 2px; overflow: hidden; image-rendering: pixelated; }
+  .progress i { display: block; height: 100%; background: repeating-linear-gradient(90deg, var(--ok) 0 8px, #5ab184 8px 10px); transition: width .6s ease-out; }
+  .count { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12px; }
+  .final { background: var(--accent); color: #fff; text-decoration: none; padding: 4px 10px; border-radius: 6px; font-weight: 600; font-size: 12px; }
+  .cols { display: grid; grid-template-columns: repeat(7, minmax(150px, 1fr)); gap: 10px; overflow-x: auto; }
+  .col h3 { font-size: 11px; color: var(--muted); margin-bottom: 8px; display: flex; justify-content: space-between; }
+  .col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; min-height: 40px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+  .card.blocked { border-color: var(--accent); }
+  .card.done { opacity: .6; }
+  .card .n { font-family: Silkscreen, monospace; font-size: 11px; color: var(--muted); display: flex; gap: 6px; align-items: center; }
+  .card .t { margin-top: 2px; font-size: 13px; overflow-wrap: anywhere; }
+  .meta { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--line); color: var(--muted); }
+  .tag.agent { background: color-mix(in srgb, var(--violet) 25%, transparent); color: #c9b9ff; }
+  .tag.red { background: color-mix(in srgb, var(--accent) 25%, transparent); color: #ffb3b6; }
+  .tag.round.hot { background: color-mix(in srgb, var(--warn) 25%, transparent); color: var(--warn); }
+  .card a { color: var(--blue); text-decoration: none; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pulse 1.6s ease-out infinite; }
+  @keyframes pulse { 70% { box-shadow: 0 0 0 6px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+  @media (prefers-reduced-motion: reduce) { .dot { animation: none; } .progress i { transition: none; } }
+  .office { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .office .group-head { padding: 12px 16px 0; }
+  .office a { color: var(--muted); font-size: 12px; margin-left: auto; }
+  iframe { display: block; width: 100%; height: 560px; border: 0; background: #000; }
+  .empty, .error { color: var(--muted); padding: 24px; text-align: center; }
+  .error { color: #ffb3b6; }
+  @media (max-width: 700px) {
+    header, main { padding-left: 16px; padding-right: 16px; }
+    .cols { grid-template-columns: repeat(7, 160px); }
+    iframe { height: 420px; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Agent Company</h1>
+  <span class="updated" id="updated">cargando…</span>
+</header>
+<main>
+  <div id="board"></div>
+  <section class="office">
+    <div class="group-head"><h2>La oficina</h2><a href="http://127.0.0.1:4510/" target="_blank" rel="noopener">abrir aparte ↗</a></div>
+    <iframe src="http://127.0.0.1:4510/" title="Pixel Agents: los agentes trabajando"></iframe>
+  </section>
+</main>
+<script>
+const COLS = [["queue", "En cola"], ["spec", "Spec"], ["dev", "Dev"], ["qa", "QA"], ["review", "Review"], ["owner", "Tu revisión"], ["done", "En el epic"]];
+const AGENT = { dev: "dev (feedback)", "tech-lead": "tech-lead", "backend-dev": "backend", "frontend-dev": "frontend", qa: "qa", designer: "diseño", reviewer: "reviewer", quality: "calidad" };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+
+function card(i, closed) {
+  const s = i.session, tags = [];
+  if (i.blocked) tags.push('<span class="tag red">bloqueada</span>');
+  if (s?.agent) tags.push(`<span class="tag agent">${esc(AGENT[s.agent] || s.agent)}</span>`);
+  if (s?.round) tags.push(`<span class="tag round ${s.round >= 3 ? "hot" : ""}">vuelta ${s.round}/${s.maxRounds}</span>`);
+  const waiting = i.col === "queue" ? i.deps.filter(d => !closed.has(d)) : [];
+  if (waiting.length) tags.push(`<span class="tag">espera ${waiting.map(d => "#" + d).join(" ")}</span>`);
+  if (i.pr) tags.push(`<a class="tag" href="${esc(i.pr.url)}" target="_blank" rel="noopener">PR #${i.pr.n}</a>`);
+  return `<li class="card ${i.blocked ? "blocked" : ""} ${i.col === "done" ? "done" : ""}">
+    <div class="n">#${i.n}${s?.active ? '<span class="dot" title="trabajando ahora"></span>' : ""}</div>
+    <div class="t">${esc(i.title.replace(/^[a-z]+(\([^)]*\))?!?:\s*/, ""))}</div>
+    ${tags.length ? `<div class="meta">${tags.join("")}</div>` : ""}</li>`;
+}
+
+function group(title, repo, items, epic, closed) {
+  const done = items.filter(i => i.col === "done").length;
+  const head = epic
+    ? `<div class="progress" role="img" aria-label="${done} de ${items.length} sub-issues en el epic"><i style="width:${items.length ? done / items.length * 100 : 0}%"></i></div>
+       <span class="count">${done}/${items.length}</span>
+       ${epic.pr && epic.pr.state === "OPEN" ? `<a class="final" href="${esc(epic.pr.url)}" target="_blank" rel="noopener">PR final listo · #${epic.pr.n}</a>` : ""}`
+    : "";
+  const cols = COLS.map(([k, label]) => {
+    const cs = items.filter(i => i.col === k);
+    return `<div class="col"><h3><span>${label}</span><span>${cs.length || ""}</span></h3><ul>${cs.map(i => card(i, closed)).join("")}</ul></div>`;
+  }).join("");
+  return `<section class="group"><div class="group-head"><h2>${esc(title)}</h2><span class="repo">${esc(repo)}</span>${head}</div><div class="cols">${cols}</div></section>`;
+}
+
+async function refresh() {
+  try {
+    const { repos, updated } = await (await fetch("/api/state")).json();
+    const html = [];
+    for (const r of repos) {
+      if (r.error) { html.push(`<div class="group error">${esc(r.name)}: no pude leer GitHub</div>`); continue; }
+      if (r.stale) html.push(`<div class="error" role="status">${esc(r.name)}: sin conexión con GitHub, muestro la última lectura</div>`);
+      const closed = new Set(r.items.filter(i => i.closed).map(i => i.n));
+      const epics = r.items.filter(i => i.epic && !i.closed);
+      for (const e of epics) html.push(group(`#${e.n} ${e.title.replace(/^[a-z]+(\([^)]*\))?!?:\s*/, "")}`, r.name, r.items.filter(i => i.parent === e.n), e, closed));
+      const loose = r.items.filter(i => !i.epic && !epics.some(e => e.n === i.parent));
+      if (loose.length) html.push(group("Issues sueltas", r.name, loose, null, closed));
+    }
+    document.getElementById("board").innerHTML = html.join("") || '<div class="group empty">Sin trabajo en curso. Lanza algo con <code>jefe @repo objetivo</code>.</div>';
+    document.getElementById("updated").textContent = "actualizado " + new Date(updated * 1000).toLocaleTimeString();
+  } catch {
+    document.getElementById("updated").textContent = "sin conexión con el tablero";
+  }
+}
+refresh();
+setInterval(refresh, 10000);
+</script>
+</body>
+</html>
