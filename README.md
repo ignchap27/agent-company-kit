@@ -22,7 +22,7 @@ flowchart TD
     TL -->|SPLIT / escalar| BL[agent:blocked + aviso macOS]
     TL --> BE[backend-dev · Sonnet · TDD]
     BE --> FE[frontend-dev · Sonnet · TDD]
-    FE --> QA[qa · no edita]
+    FE --> QA[qa · tests, cobertura, test smells · no edita]
     QA -->|fail| BE
     QA --> RV[reviewer · Sonnet · no edita]
     RV -->|changes| BE
@@ -41,6 +41,7 @@ flowchart TD
 - **Sin duplicados:** el despachador cambia la etiqueta a `agent:in-progress` antes de lanzar y usa un lock con `mkdir`; solo considera issues **creadas por ti** (`--author`), lo que también corta el prompt injection de terceros.
 - **Cualquier repo:** busca en todos tus repos (y en las orgs que pongas en `AGENT_OWNERS`); si el repo no está en `~/Developer/<nombre>`, lo clona ahí.
 - **Stack:** los agentes no asumen ninguno. El tech-lead detecta los comandos reales del repo (CLAUDE.md, manifiestos, CI) y los incluye en el spec. `/onboard-repo` los deja fijos en `CLAUDE.md` + `.claude/verify.sh`.
+- **Tests con criterio TDD ([`mattpocock-skills:tdd`](https://github.com/mattpocock/skills)):** el tech-lead fija en el spec la seam y los mocks de cada AC (y un **Repro** si es bug); los devs llevan `tdd` precargado y trabajan en cortes verticales (un test rojo → mínimo código → siguiente; en `fix/`, primero el test que reproduce el síntoma). QA rechaza en `test_smells` los tests tautológicos (esperado recalculado como el código), acoplados a la implementación (mocks internos, nº de llamadas, verificar por la BD), con mocks fuera de los bordes del sistema, con asserts débiles y los fixes sin test de regresión. El reviewer suma los smells de Fowler.
 - **Permisos y guardas solo para los agentes:** `bg-settings.json` (modo `auto`, allow/deny, hook `guard.sh`) se pasa con `--settings` únicamente a las sesiones despachadas. Tus sesiones normales no cambian.
 
 ## Contenido del kit
@@ -57,6 +58,8 @@ home/.claude/skills/frontend-craft/      anti-slop UI: estados, a11y, copy, scre
 home/.claude/skills/backend-craft/       anti-slop backend: bordes, errores, datos, seguridad (backend-dev)
 home/.claude/skills/{emil-design-eng,animate,animation-performance,break-ui}/  Emil Kowalski (MIT), copia fija; ver ORIGEN
 home/.claude/skills/vercel-react-best-practices/  Vercel (MIT), copia fija; ver ORIGEN
+(plugin) mattpocock-skills:tdd           precargado en backend-dev y frontend-dev; sus reglas de tests también en qa, tech-lead y reviewer
+(plugin) mattpocock-skills:retro, writing-for-agents  para ti, al mejorar el kit (no en el pipeline)
 home/.claude/hooks/guard.sh              bloquea merge, aprobar, push a main/master/develop, --force, --no-verify; qa/quality/reviewer/tech-lead de solo lectura
 home/.claude/hooks/require-green.sh      el dev no termina si .claude/verify.sh falla (una insistencia)
 home/.claude/agent-company/dispatch.sh   cola multi-repo → worktree → claude --bg; limpia worktrees de PRs cerrados
