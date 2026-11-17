@@ -68,6 +68,7 @@ INVESTIGACION.md                         Fases 1–2 con fuentes
 
 ## Instalación (≈15 min)
 
+0. Plugins requeridos (los agentes los precargan): `ponytail@ponytail` y `mattpocock-skills@claude-plugins-official` (`/plugin install mattpocock-skills@claude-plugins-official`).
 1. `./install.sh`: enlaza agentes, skills y hooks en `~/.claude`. Si ya existe un archivo real con el mismo nombre, lo salta.
 2. En cada repo donde vayan a trabajar los agentes: abre `claude` una vez y acepta el diálogo de trust. Es obligatorio: `claude --bg` desde un script falla con `Workspace not trusted` ([doc](https://code.claude.com/docs/en/agent-view#from-your-shell)). La confianza va por raíz de repo y los worktrees la heredan ([doc](https://code.claude.com/docs/en/permissions)). Ahí mismo ejecuta `/onboard-repo`.
 3. Opcional, SonarQube como MCP para todos tus repos (necesita Docker):
@@ -85,6 +86,7 @@ INVESTIGACION.md                         Fases 1–2 con fuentes
 | Ver la cola | GitHub: `label:agent:ready`, `agent:in-progress`, `agent:review`, `agent:blocked` |
 | Revisar un PR grande con más rigor | `/code-review ultra <PR>` (lo lanzas tú; nube, 15–25 min, de pago tras 3 gratis) |
 | Pedir cambios tras tu revisión | comenta en el PR y vuelve a poner `agent:ready` en la issue, o entra a la sesión y díselo |
+| Mejorar el kit tras una issue bloqueada o cara | `/mattpocock-skills:retro` sobre esa sesión; al editar agentes o skills, carga `mattpocock-skills:writing-for-agents` |
 | Parar todo | `touch ~/.claude/agent-company/STOP` (`rm` para reanudar); para quitar el ciclo: `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.agent-company.dispatch.plist` |
 | Ajustar | variables `AGENT_REPOS_DIR` (por defecto `~/Developer`), `AGENT_MAX_WIP` (3), `AGENT_OWNERS` (tu usuario + orgs) |
 

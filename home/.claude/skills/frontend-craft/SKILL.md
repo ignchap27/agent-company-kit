@@ -34,7 +34,7 @@ Si el repo ya tiene design system, tokens, componentes o tema: úsalos y no inve
 5. **Copy:** verbos concretos ("Guardar cambios", no "Enviar"), la misma palabra para la misma acción en todo el flujo, sentence case, errores sin disculpas ni vaguedad. Reutiliza el tono y las cadenas i18n existentes.
 6. **Movimiento:** solo como respuesta a una acción o un único momento de entrada. Sin rebotes ni easing elástico. CSS para lo predeterminado; Motion (`motion/react`) para springs, layout, salidas y gestos. Detalle en `animate` y `emil-design-eng`.
 7. **Sin dependencias nuevas** para lo que CSS o el sistema de componentes ya resuelve.
-8. **Tests de comportamiento, no de datos:** consulta por rol/label (`getByRole("button", { name: SAVE_LABEL })`) o por la constante/cadena i18n importada, nunca por copy, nombre de producto o dato de fixture reescrito a mano (`getByText("MISW")`, `toBe("Ignacio Chaparro")`). El valor esperado sale del fixture o de la fuente de verdad. Si cambiar un texto o una marca rompe el test sin cambiar comportamiento, está mal. QA lo rechaza.
+8. **Tests de comportamiento:** consulta como el usuario, por rol/label (`getByRole("button", { name: "Guardar" })`), no por clases ni estructura interna. Mock solo de red/API, nunca de componentes o hooks propios. El valor esperado sale de una fuente independiente (literal conocido, el spec), nunca recalculado como lo hace el componente. QA lo rechaza.
 
 ## Verificación visual (obligatoria si hay dev server o storybook)
 

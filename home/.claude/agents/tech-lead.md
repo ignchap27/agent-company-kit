@@ -25,10 +25,11 @@ Devuelve EXACTAMENTE este Markdown, sin nada más:
 - [ ] AC1: Dado … cuando … entonces …
 **Archivos afectados:** rutas existentes o nuevas por área.
 **Contrato backend↔frontend** (si "ambos"): endpoints, payloads, errores.
-**Plan de tests:** qué test cubre cada AC y qué comportamiento prueba (no qué dato: nada de asserts sobre nombres, copy o config hardcodeados).
+**Plan de tests:** por AC, el test que lo cubre, la **seam** donde vive (interfaz pública por la que se observa el comportamiento: la más alta posible, preferir seams existentes, cuantas menos mejor), qué comportamiento prueba y qué se mockea (solo límites del sistema: red, terceros, reloj). Los valores esperados salen de una fuente independiente (literal conocido, ejemplo trabajado, el spec), nunca recalculados como el código.
+**Repro** (solo si la issue es un bug): síntoma exacto y el test o comando que debe ponerse rojo con él.
 **Riesgos:** seguridad, migraciones, rendimiento, compatibilidad.
 **Fuera de alcance:** …
-**Tamaño estimado:** líneas. Si > 1.500, responde en su lugar `SPLIT:` con una lista de sub-issues (máximo 5, cada una ~500–1.500 líneas; agrupa lo pequeño, porque cada issue paga un coste fijo de sesión, revisión y PR).
+**Tamaño estimado:** líneas. Si > 1.500, responde en su lugar `SPLIT:` con una lista de sub-issues (máximo 5, cada una ~500–1.500 líneas; agrupa lo pequeño, porque cada issue paga un coste fijo de sesión, revisión y PR). Cada sub-issue es un corte vertical: atraviesa todas las capas que necesita (datos, API, UI, tests) y se verifica sola. El refactor previo que facilita el resto va primero. Un cambio mecánico amplio (renombrar una columna, cambiar un tipo compartido) va como expand → migrar por lotes → contract, cada paso en verde.
 **Escalar a humano:** `sí` si toca auth, pagos, migraciones destructivas, infraestructura, secretos, o si el repo no tiene tests; `no` en otro caso, con motivo.
 
 No inventes APIs: cita la ruta donde existe cada función o librería que propongas usar.
