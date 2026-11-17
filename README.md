@@ -22,7 +22,7 @@ flowchart TD
     TL -->|SPLIT / escalar| BL[agent:blocked + aviso macOS]
     TL --> BE[backend-dev · Sonnet · TDD]
     BE --> FE[frontend-dev · Sonnet · TDD]
-    FE --> QA[qa · no edita]
+    FE --> QA[qa · tests, cobertura, test smells · no edita]
     QA -->|fail| BE
     QA --> RV[reviewer · Sonnet · no edita]
     RV -->|changes| BE
@@ -41,6 +41,7 @@ flowchart TD
 - **Sin duplicados:** el despachador cambia la etiqueta a `agent:in-progress` antes de lanzar y usa un lock con `mkdir`; solo considera issues **creadas por ti** (`--author`), lo que también corta el prompt injection de terceros.
 - **Cualquier repo:** busca en todos tus repos (y en las orgs que pongas en `AGENT_OWNERS`); si el repo no está en `~/Developer/<nombre>`, lo clona ahí.
 - **Stack:** los agentes no asumen ninguno. El tech-lead detecta los comandos reales del repo (CLAUDE.md, manifiestos, CI) y los incluye en el spec. `/onboard-repo` los deja fijos en `CLAUDE.md` + `.claude/verify.sh`.
+- **Tests con criterio TDD ([`mattpocock-skills:tdd`](https://github.com/mattpocock/skills)):** el tech-lead fija en el spec la seam y los mocks de cada AC (y un **Repro** si es bug); los devs llevan `tdd` precargado y trabajan en cortes verticales (un test rojo → mínimo código → siguiente; en `fix/`, primero el test que reproduce el síntoma). QA rechaza en `test_smells` los tests tautológicos (esperado recalculado como el código), acoplados a la implementación (mocks internos, nº de llamadas, verificar por la BD), con mocks fuera de los bordes del sistema, con asserts débiles y los fixes sin test de regresión. El reviewer suma los smells de Fowler.
 - **Permisos y guardas solo para los agentes:** `bg-settings.json` (modo `auto`, allow/deny, hook `guard.sh`) se pasa con `--settings` únicamente a las sesiones despachadas. Tus sesiones normales no cambian.
 
 ## Contenido del kit
@@ -57,6 +58,8 @@ home/.claude/skills/frontend-craft/      anti-slop UI: estados, a11y, copy, scre
 home/.claude/skills/backend-craft/       anti-slop backend: bordes, errores, datos, seguridad (backend-dev)
 home/.claude/skills/{emil-design-eng,animate,animation-performance,break-ui}/  Emil Kowalski (MIT), copia fija; ver ORIGEN
 home/.claude/skills/vercel-react-best-practices/  Vercel (MIT), copia fija; ver ORIGEN
+(plugin) mattpocock-skills:tdd           precargado en backend-dev y frontend-dev; sus reglas de tests también en qa, tech-lead y reviewer
+(plugin) mattpocock-skills:retro, writing-for-agents  para ti, al mejorar el kit (no en el pipeline)
 home/.claude/hooks/guard.sh              bloquea merge, aprobar, push a main/master/develop, --force, --no-verify; qa/quality/reviewer/tech-lead de solo lectura
 home/.claude/hooks/require-green.sh      el dev no termina si .claude/verify.sh falla (una insistencia)
 home/.claude/agent-company/dispatch.sh   cola multi-repo → worktree → claude --bg; limpia worktrees de PRs cerrados
@@ -68,6 +71,7 @@ INVESTIGACION.md                         Fases 1–2 con fuentes
 
 ## Instalación (≈15 min)
 
+0. Plugins requeridos (los agentes los precargan): `ponytail@ponytail` y `mattpocock-skills@claude-plugins-official` (`/plugin install mattpocock-skills@claude-plugins-official`).
 1. `./install.sh`: enlaza agentes, skills y hooks en `~/.claude`. Si ya existe un archivo real con el mismo nombre, lo salta.
 2. En cada repo donde vayan a trabajar los agentes: abre `claude` una vez y acepta el diálogo de trust. Es obligatorio: `claude --bg` desde un script falla con `Workspace not trusted` ([doc](https://code.claude.com/docs/en/agent-view#from-your-shell)). La confianza va por raíz de repo y los worktrees la heredan ([doc](https://code.claude.com/docs/en/permissions)). Ahí mismo ejecuta `/onboard-repo`.
 3. Opcional, SonarQube como MCP para todos tus repos (necesita Docker):
@@ -85,6 +89,7 @@ INVESTIGACION.md                         Fases 1–2 con fuentes
 | Ver la cola | GitHub: `label:agent:ready`, `agent:in-progress`, `agent:review`, `agent:blocked` |
 | Revisar un PR grande con más rigor | `/code-review ultra <PR>` (lo lanzas tú; nube, 15–25 min, de pago tras 3 gratis) |
 | Pedir cambios tras tu revisión | comenta en el PR y vuelve a poner `agent:ready` en la issue, o entra a la sesión y díselo |
+| Mejorar el kit tras una issue bloqueada o cara | `/mattpocock-skills:retro` sobre esa sesión; al editar agentes o skills, carga `mattpocock-skills:writing-for-agents` |
 | Parar todo | `touch ~/.claude/agent-company/STOP` (`rm` para reanudar); para quitar el ciclo: `launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.agent-company.dispatch.plist` |
 | Ajustar | variables `AGENT_REPOS_DIR` (por defecto `~/Developer`), `AGENT_MAX_WIP` (3), `AGENT_OWNERS` (tu usuario + orgs) |
 
