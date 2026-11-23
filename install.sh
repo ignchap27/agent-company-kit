@@ -27,7 +27,7 @@ for arg in "$@"; do
       echo "despachador activo cada 10 min (log: /tmp/agent-company-dispatch.log)" ;;
     --with-asistente)
       command -v tmux >/dev/null || { echo "falta tmux: brew install tmux"; exit 1; }
-      [ -d "$HOME/segundo-cerebro" ] || { echo "falta ~/segundo-cerebro: ver README, sección Asistente"; exit 1; }
+      [ -d "$HOME/Developer/segundo-cerebro" ] || { echo "falta ~/Developer/segundo-cerebro: ver README, sección Asistente"; exit 1; }
       load com.agent-company.asistente
       load com.agent-company.asistente-lint
       echo "asistente activo (tmux attach -t asistente; log: /tmp/agent-company-asistente.log)" ;;

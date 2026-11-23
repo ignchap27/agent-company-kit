@@ -99,10 +99,10 @@ INVESTIGACION.md                         Fases 1–2 con fuentes
 
 ## Asistente por Telegram (segundo cerebro)
 
-Una sesión fija (`claude --agent asistente`) que te escucha por Telegram vía [Channels](https://code.claude.com/docs/en/channels) (research preview). **Nunca programa:** guarda tus notas en `~/segundo-cerebro` y, si le pides código, crea la issue y llama a `dispatch.sh`. Cada issue abre su propia sesión con su tech-lead, así que varios proyectos avanzan a la vez (tope `AGENT_MAX_WIP`) y el asistente sigue libre para hablar contigo.
+Una sesión fija (`claude --agent asistente`) que te escucha por Telegram vía [Channels](https://code.claude.com/docs/en/channels) (research preview). **Nunca programa:** guarda tus notas en `~/Developer/segundo-cerebro` y, si le pides código, crea la issue y llama a `dispatch.sh`. Cada issue abre su propia sesión con su tech-lead, así que varios proyectos avanzan a la vez (tope `AGENT_MAX_WIP`) y el asistente sigue libre para hablar contigo.
 
 ```
-Telegram ─► asistente (tmux, siempre vivo) ─┬─ notas/ideas ─► ~/segundo-cerebro (repo privado)
+Telegram ─► asistente (tmux, siempre vivo) ─┬─ notas/ideas ─► ~/Developer/segundo-cerebro (repo privado)
                                             ├─ "hazme X en repo A" ─► issue agent:ready ─► sesión bg → tech-lead → … → PR
                                             └─ "¿cómo va?" ─► gh search (labels agent:*) ─► resumen
 ```
@@ -110,9 +110,9 @@ Telegram ─► asistente (tmux, siempre vivo) ─┬─ notas/ideas ─► ~/se
 El cerebro sigue la plantilla pública [`segundo-cerebro-template`](https://github.com/ignchap27/segundo-cerebro-template): LLM Wiki de Karpathy + PARA + nota diaria. Lint cada noche a las 03:00.
 
 1. `brew install tmux oven-sh/bun/bun` (el plugin de Telegram necesita Bun).
-2. Tu copia **privada** del cerebro: `cd ~ && gh repo create segundo-cerebro --private --template ignchap27/segundo-cerebro-template --clone`. Rellena `perfil.md`.
+2. Tu copia **privada** del cerebro: `cd ~/Developer && gh repo create segundo-cerebro --private --template ignchap27/segundo-cerebro-template --clone`. Rellena `perfil.md`.
 3. Bot: en Telegram, `@BotFather` → `/newbot` → copia el token.
-4. `cd ~/segundo-cerebro && claude` (acepta el trust) y dentro: `/plugin install telegram@claude-plugins-official` (scope user), `/telegram:configure <token>`. Sal.
+4. `cd ~/Developer/segundo-cerebro && claude` (acepta el trust) y dentro: `/plugin install telegram@claude-plugins-official` (scope user), `/telegram:configure <token>`. Sal.
 5. Emparejar: `claude --agent asistente --channels plugin:telegram@claude-plugins-official`, escribe al bot, te da un código → `/telegram:access pair <código>` y después **`/telegram:access policy allowlist`** (solo tu cuenta). Sal.
 6. `./install.sh --with-asistente`: vigilante cada 5 min (relanza la sesión tmux si muere) + lint nocturno. Para mirarla: `tmux attach -t asistente` (salir sin matarla: `Ctrl-b d`).
 

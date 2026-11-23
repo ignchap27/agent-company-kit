@@ -3,7 +3,7 @@
 # no existe (reinicio, crash), la levanta. `asistente.sh lint` = revisión nocturna del cerebro.
 set -euo pipefail
 SETTINGS="$HOME/.claude/agent-company/bg-settings.json"
-cd "${ASISTENTE_DIR:-$HOME/segundo-cerebro}"
+cd "${ASISTENTE_DIR:-$HOME/Developer/segundo-cerebro}"
 
 if [ "${1:-}" = lint ]; then
   exec claude -p --agent asistente --settings "$SETTINGS" \
