@@ -19,6 +19,8 @@
       "Bash(osascript -e *)",
       "Bash(~/.claude/agent-company/merge-stacked.sh *)",
       "Bash(~/.claude/agent-company/dispatch.sh)",
+      "Bash(~/.claude/agent-company/dispatch.sh *)",
+      "Bash(gh search *)",
       "Bash(~/.claude/agent-company/fetch-images.sh *)"
     ],
     "deny": [

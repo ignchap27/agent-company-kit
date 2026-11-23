@@ -65,6 +65,8 @@ home/.claude/hooks/require-green.sh      el dev no termina si .claude/verify.sh 
 home/.claude/agent-company/dispatch.sh   cola multi-repo → worktree → claude --bg; limpia worktrees de PRs cerrados
 home/.claude/agent-company/bg-settings.json
 launchd/com.agent-company.dispatch.plist cada 10 min
+home/.claude/agents/asistente.md         asistente personal por Telegram; segundo cerebro + crea issues para el tech-lead
+home/.claude/agent-company/asistente.sh  levanta la sesión tmux del asistente / lint nocturno (launchd/com.agent-company.asistente*.plist)
 repo-optional/.github/workflows/ci.yml   CI de PRs (verify.sh + Sonar con quality gate) para copiar en los repos que quieras
 INVESTIGACION.md                         Fases 1–2 con fuentes
 ```
@@ -94,6 +96,29 @@ INVESTIGACION.md                         Fases 1–2 con fuentes
 | Ajustar | variables `AGENT_REPOS_DIR` (por defecto `~/Developer`), `AGENT_MAX_WIP` (3), `AGENT_OWNERS` (tu usuario + orgs) |
 
 **Avisos:** notificación de macOS cuando un PR queda listo o una issue se bloquea. GitHub no te notifica de tus propios PRs, por eso va por `osascript`.
+
+## Asistente por Telegram (segundo cerebro)
+
+Una sesión fija (`claude --agent asistente`) que te escucha por Telegram vía [Channels](https://code.claude.com/docs/en/channels) (research preview). **Nunca programa:** guarda tus notas en `~/segundo-cerebro` y, si le pides código, crea la issue y llama a `dispatch.sh`. Cada issue abre su propia sesión con su tech-lead, así que varios proyectos avanzan a la vez (tope `AGENT_MAX_WIP`) y el asistente sigue libre para hablar contigo.
+
+```
+Telegram ─► asistente (tmux, siempre vivo) ─┬─ notas/ideas ─► ~/segundo-cerebro (repo privado)
+                                            ├─ "hazme X en repo A" ─► issue agent:ready ─► sesión bg → tech-lead → … → PR
+                                            └─ "¿cómo va?" ─► gh search (labels agent:*) ─► resumen
+```
+
+El cerebro sigue la plantilla pública [`segundo-cerebro-template`](https://github.com/ignchap27/segundo-cerebro-template): LLM Wiki de Karpathy + PARA + nota diaria. Lint cada noche a las 03:00.
+
+1. `brew install tmux oven-sh/bun/bun` (el plugin de Telegram necesita Bun).
+2. Tu copia **privada** del cerebro: `cd ~ && gh repo create segundo-cerebro --private --template ignchap27/segundo-cerebro-template --clone`. Rellena `perfil.md`.
+3. Bot: en Telegram, `@BotFather` → `/newbot` → copia el token.
+4. `cd ~/segundo-cerebro && claude` (acepta el trust) y dentro: `/plugin install telegram@claude-plugins-official` (scope user), `/telegram:configure <token>`. Sal.
+5. Emparejar: `claude --agent asistente --channels plugin:telegram@claude-plugins-official`, escribe al bot, te da un código → `/telegram:access pair <código>` y después **`/telegram:access policy allowlist`** (solo tu cuenta). Sal.
+6. `./install.sh --with-asistente`: vigilante cada 5 min (relanza la sesión tmux si muere) + lint nocturno. Para mirarla: `tmux attach -t asistente` (salir sin matarla: `Ctrl-b d`).
+
+**Seguridad:** quien pueda escribirle al bot manda en tu Mac. Allowlist con tu ID y nada de grupos. Corre con `bg-settings.json` (modo `auto` + `guard.sh`): no puede mergear ni hacer push a main de tus repos.
+
+**No verificado aún:** `--channels` dentro de tmux lanzado por launchd, y `--channels` junto a `--agent`.
 
 ## Features grandes: stacked PRs (sin intervención hasta el final)
 
