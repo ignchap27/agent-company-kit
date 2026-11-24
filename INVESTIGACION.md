@@ -54,8 +54,8 @@ Este archivo conserva la investigación (Fases 1 y 2). El diseño vigente (local
 | **PR pequeño** | Tope ~400 líneas; si no cabe, el tech-lead responde `SPLIT:` y se crean sub-issues. |
 | **1 tarea = 1 rama = 1 entorno** | Rama `claude/issue-<n>` en una VM cloud propia. |
 | **Quality gates** | CI: lint → typecheck → tests+cobertura → e2e → Sonar con `sonar.qualitygate.wait=true` (el job falla si el gate falla; parámetro documentado por SonarSource en docs.sonarsource.com, URL exacta no verificada) + [scan action](https://github.com/SonarSource/sonarqube-scan-action). |
-| **Revisión cruzada** | `reviewer` (Opus, solo lectura, otro contexto) ≠ autor; QA no puede editar. Tú: revisión final (+ `/code-review ultra` opcional). |
-| **Reintentos acotados** | 3 vueltas máx.; luego `agent:blocked` + mención al dueño. `maxTurns` en cada agente. |
+| **Revisión cruzada** | `reviewer` (Sonnet, solo lectura, otro contexto) ≠ autor; QA no puede editar. Tú: revisión final (+ `/code-review ultra` opcional). |
+| **Reintentos acotados** | 1 pasada de revisión y máx. 1 corrección (solo `high`); luego `agent:blocked` + mención al dueño. `maxTurns` en cada agente. |
 | **Tests falsos** | QA busca tests borrados, `.skip`, asserts relajados, mocks del SUT, umbrales bajados; la cobertura de código nuevo la mide Sonar, no el agente. |
 | **Alucinación de APIs** | Regla en CLAUDE.md + tech-lead y reviewer deben citar dónde existe cada API; typecheck en CI. |
 | **Desbordar alcance** | QA y reviewer reportan `out_of_scope`. |
