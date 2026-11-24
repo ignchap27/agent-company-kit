@@ -1,0 +1,16 @@
+# Whisper local (transcripción de audio) para cualquier agente. API: POST http://127.0.0.1:9100/asr
+# Uso: curl -s -F audio_file=@nota.ogg "http://127.0.0.1:9100/asr?language=es&output=txt"
+services:
+  whisper:
+    image: onerahmet/openai-whisper-asr-webservice:latest
+    container_name: agent-company-whisper
+    ports: ["127.0.0.1:9100:9000"]
+    environment:
+      ASR_ENGINE: faster_whisper
+      ASR_MODEL: small
+      ASR_MODEL_PATH: /root/.cache/whisper
+    volumes:
+      - whisper_models:/root/.cache
+    restart: unless-stopped
+volumes:
+  whisper_models:
