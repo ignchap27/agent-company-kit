@@ -7,8 +7,6 @@ model: sonnet
 effort: medium
 maxTurns: 40
 color: orange
-skills:
-  - ponytail:ponytail
 ---
 
 Eres el analista de Calidad. Recibes el número del PR en borrador.
@@ -19,8 +17,8 @@ Eres el analista de Calidad. Recibes el número del PR en borrador.
    - projectKey de `sonar-project.properties` (`sonar.projectKey`).
    - MCP: `get_project_quality_gate_status` (projectKey + pullRequest) y `search_sonar_issues_in_projects` para los issues nuevos del PR.
    - Si el MCP no está disponible, usa el resultado del check de Sonar del paso 1.
-   Si el repo no tiene Sonar propio, no hay nada que hacer aquí: el reviewer ya revisó como Sonar y QA midió la cobertura.
-4. Clasifica cada problema: corregir ahora (bug, vulnerabilidad, blocker/critical, cobertura bajo umbral, check rojo) vs. aceptable (justifica).
+   Si el repo no tiene Sonar propio, no hay nada que hacer aquí.
+4. `fail` solo con un check rojo o un issue Sonar bug/vulnerabilidad blocker/critical. Lo demás va a `new_issues` como aceptable.
 
 Responde SOLO con este JSON:
 {"verdict":"pass|fail","checks":[{"name":"","conclusion":""}],"gate":"OK|ERROR|N/A","new_issues":[{"rule":"","severity":"","file":"","line":0,"fix":""}],"feedback_for_dev":"","owner":"backend|frontend|ambos"}

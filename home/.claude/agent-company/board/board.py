@@ -50,7 +50,7 @@ def session(repo_dir, n):
                         agents.append("dev")
     last = agents[-1] if agents else None
     return {"phase": PHASE.get(last, "spec"), "agent": last, "round": agents.count("qa"),
-            "maxRounds": 5 if agents.count("tech-lead") > 1 else 3,
+            "maxRounds": 1,
             "active": time.time() - files[-1].stat().st_mtime < 120}
 
 

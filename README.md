@@ -18,18 +18,18 @@ flowchart TD
   Q -->|sí| WT["git worktree .claude/worktrees/issue-N<br/>rama feat/N-slug"]
   WT --> BG["claude --bg --settings bg-settings.json '/run-issue N'"]
   subgraph S [Sesión en segundo plano · visible en 'claude agents']
-    BG --> TL[tech-lead · Sonnet · solo lectura]
+    BG --> TL[tech-lead · Opus · spec + skills por dev]
     TL -->|SPLIT / escalar| BL[agent:blocked + aviso macOS]
-    TL --> BE[backend-dev · Sonnet · TDD]
-    BE --> FE[frontend-dev · Sonnet · TDD]
-    FE --> QA[qa · tests, cobertura, test smells · no edita]
-    QA -->|fail| BE
-    QA --> RV[reviewer · Sonnet · no edita]
-    RV -->|changes| BE
-    RV --> PRD[push + PR en borrador]
+    TL --> BE[backend-dev · Sonnet · TDD en lógica]
+    BE --> FE[frontend-dev · Sonnet]
+    FE --> REV[qa + reviewer + designer · Sonnet · una sola pasada]
+    REV -->|algún high| FIX[1 dev de corrección + verify.sh]
+    REV -->|sin high| PRD[push + PR en borrador]
+    FIX --> PRD
+    FIX -->|verify rojo| BL
     PRD --> QL[quality · gh pr checks]
-    QL -->|fail, 3 vueltas + re-spec + 2| BE
-    QL -->|vueltas agotadas| BL
+    QL -->|rojo y corrección sin usar| FIX
+    QL -->|rojo y corrección usada| BL
     QL -->|pass| RDY[gh pr ready + agent:review + aviso macOS]
   end
   RDY --> O
@@ -41,24 +41,24 @@ flowchart TD
 - **Sin duplicados:** el despachador cambia la etiqueta a `agent:in-progress` antes de lanzar y usa un lock con `mkdir`; solo considera issues **creadas por ti** (`--author`), lo que también corta el prompt injection de terceros.
 - **Cualquier repo:** busca en todos tus repos (y en las orgs que pongas en `AGENT_OWNERS`); si el repo no está en `~/Developer/<nombre>`, lo clona ahí.
 - **Stack:** los agentes no asumen ninguno. El tech-lead detecta los comandos reales del repo (CLAUDE.md, manifiestos, CI) y los incluye en el spec. `/onboard-repo` los deja fijos en `CLAUDE.md` + `.claude/verify.sh`.
-- **Tests con criterio TDD ([`mattpocock-skills:tdd`](https://github.com/mattpocock/skills)):** el tech-lead fija en el spec la seam y los mocks de cada AC (y un **Repro** si es bug); los devs llevan `tdd` precargado y trabajan en cortes verticales (un test rojo → mínimo código → siguiente; en `fix/`, primero el test que reproduce el síntoma). QA rechaza en `test_smells` los tests tautológicos (esperado recalculado como el código), acoplados a la implementación (mocks internos, nº de llamadas, verificar por la BD), con mocks fuera de los bordes del sistema, con asserts débiles y los fixes sin test de regresión. El reviewer suma los smells de Fowler.
+- **Sin bucles largos:** una sola pasada de revisión y como máximo **una** corrección, solo por hallazgos `high` (roto, bug, seguridad, AC no cumplido). Todo `medium`/`low` va a "Pendientes" del PR: lo decides tú al revisar. Tests proporcionales: solo lógica con ramas (TDD de [`mattpocock-skills:tdd`](https://github.com/mattpocock/skills)); sin cobertura mínima.
+- **Skills bajo demanda:** el tech-lead (Opus) escribe en el spec qué skills carga cada dev; solo `ponytail` (y `tdd` en backend) van precargados.
 - **Permisos y guardas solo para los agentes:** `bg-settings.json` (modo `auto`, allow/deny, hook `guard.sh`) se pasa con `--settings` únicamente a las sesiones despachadas. Tus sesiones normales no cambian.
 
 ## Contenido del kit
 
 ```
 install.sh                               enlaces simbólicos en ~/.claude (+ launchd con --with-launchd)
-home/.claude/agents/                     tech-lead, backend-dev, frontend-dev, qa, reviewer, quality
+home/.claude/agents/                     tech-lead (Opus), backend-dev, frontend-dev, qa, reviewer, designer, quality (Sonnet)
 home/.claude/skills/feature/             /feature [owner/repo] <desc> → issue + despacho inmediato
 home/.claude/skills/run-issue/           /run-issue <n> → pipeline completo (lo usa el despachador)
 home/.claude/skills/onboard-repo/        /onboard-repo → CLAUDE.md + .claude/verify.sh vía PR
-home/.claude/skills/frontend-design/     skill oficial de Anthropic (Apache 2.0), precargado en frontend-dev y designer (con emil-design-eng)
+home/.claude/skills/frontend-design/     skill oficial de Anthropic (Apache 2.0)
+home/.claude/skills/modern-web-guidance/ Google Chrome (Apache 2.0), copia fija; ver ORIGEN
                                          Opcional: diseños propios (p. ej. de Claude Design) en <repo>/docs/referencias/<vista>.png → dev y designer los siguen; sin ellos, el pipeline sigue igual
-home/.claude/skills/frontend-craft/      anti-slop UI: estados, a11y, copy, screenshot (frontend-dev)
-home/.claude/skills/backend-craft/       anti-slop backend: bordes, errores, datos, seguridad (backend-dev)
 home/.claude/skills/{emil-design-eng,animate,animation-performance,break-ui}/  Emil Kowalski (MIT), copia fija; ver ORIGEN
 home/.claude/skills/vercel-react-best-practices/  Vercel (MIT), copia fija; ver ORIGEN
-(plugin) mattpocock-skills:tdd           precargado en backend-dev y frontend-dev; sus reglas de tests también en qa, tech-lead y reviewer
+(plugin) mattpocock-skills:tdd           precargado en backend-dev; frontend-dev lo carga si el spec lo pide
 (plugin) mattpocock-skills:retro, writing-for-agents  para ti, al mejorar el kit (no en el pipeline)
 home/.claude/hooks/guard.sh              bloquea merge, aprobar, push a main/master/develop, --force, --no-verify; qa/quality/reviewer/tech-lead de solo lectura
 home/.claude/hooks/require-green.sh      el dev no termina si .claude/verify.sh falla (una insistencia)
@@ -145,7 +145,18 @@ Los PRs salen con tu usuario, y GitHub no deja aprobar formalmente un PR propio.
 
 ## Costos
 
-Cada sesión despachada consume tu plan igual que una interactiva ([doc](https://code.claude.com/docs/en/agent-view)). No hay cifra oficial por feature: mide 3 issues piloto con `/usage` (incluye el desglose por subagente). Palancas: `AGENT_MAX_WIP` (2 por defecto), Sonnet + ponytail en todos los agentes y sesiones, `maxTurns` en cada agente y máximo 3 vueltas (+2 tras un re-spec del tech-lead). Si tienes usage credits activos, ponles un límite mensual en claude.ai/settings/usage ([doc](https://code.claude.com/docs/en/costs)).
+Cada sesión despachada consume tu plan igual que una interactiva ([doc](https://code.claude.com/docs/en/agent-view)). Mide con `/usage` (desglose por subagente) o sumando `usage` de los transcripts en `~/.claude/projects/*worktrees-issue-*/`.
+
+**Medición 2026-11-24 (portafolio, una landing):** el pipeline anterior agotó el límite de 5 h. Issues 1/3/4 ≈ $73 equivalentes de API: designer en Opus 45 % (32–68 capturas por vuelta, reabría vueltas por "se ve genérico"), frontend-dev 33 % (relanzado en cada vuelta, 5 skills precargados), reviewer + qa solo 8 %. Issue 1 hizo 5 vueltas con el reviewer aprobando en todas.
+
+Cambios que salieron de ahí:
+- Una pasada de revisión y máximo **una** corrección, solo por `high`; `medium`/`low` van al PR. Sin cobertura mínima ni gates estilo Sonar.
+- Solo el tech-lead en Opus (spec + línea `Skills:` por dev); el resto, designer incluido, en Sonnet. Designer: máx. 6 capturas, sin scripts propios.
+- Skills propias (`backend-craft`, `frontend-craft`, `ux-heuristics`) borradas; precargado solo `ponytail` (+ `tdd` en backend, `ponytail-review` en reviewer).
+
+Resultado al relanzar la issue 4 con el pipeline nuevo: **$2,71 frente a ~$15**, 0 correcciones, PR listo. Ahora el mayor gasto es el orquestador (54 %).
+
+Palancas: `AGENT_MAX_WIP` (2 por defecto), `maxTurns` en cada agente, una sola corrección. Si tienes usage credits activos, ponles un límite mensual en claude.ai/settings/usage ([doc](https://code.claude.com/docs/en/costs)).
 
 ## Plan
 

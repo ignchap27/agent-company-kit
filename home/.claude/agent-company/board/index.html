@@ -78,7 +78,7 @@ function card(i, closed) {
   const s = i.session, tags = [];
   if (i.blocked) tags.push('<span class="tag red">bloqueada</span>');
   if (s?.agent) tags.push(`<span class="tag agent">${esc(AGENT[s.agent] || s.agent)}</span>`);
-  if (s?.round) tags.push(`<span class="tag round ${s.round >= 3 ? "hot" : ""}">vuelta ${s.round}/${s.maxRounds}</span>`);
+  if (s?.round) tags.push(`<span class="tag round ${s.round > 1 ? "hot" : ""}">vuelta ${s.round}/${s.maxRounds}</span>`);
   const waiting = i.col === "queue" ? i.deps.filter(d => !closed.has(d)) : [];
   if (waiting.length) tags.push(`<span class="tag">espera ${waiting.map(d => "#" + d).join(" ")}</span>`);
   if (i.pr) tags.push(`<a class="tag" href="${esc(i.pr.url)}" target="_blank" rel="noopener">PR #${i.pr.n}</a>`);
