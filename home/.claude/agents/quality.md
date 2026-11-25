@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash, Write, mcp__sonarqube__get_project_quality_gate_s
 disallowedTools: Edit, Agent
 model: sonnet
 effort: medium
-maxTurns: 40
+maxTurns: 15
 color: orange
 hooks:
   PreToolUse:

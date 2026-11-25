@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash, Write
 disallowedTools: Edit, Agent
 model: opus
 effort: medium
-maxTurns: 40
+maxTurns: 25
 color: purple
 hooks:
   PreToolUse:

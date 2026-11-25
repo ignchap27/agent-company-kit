@@ -5,7 +5,7 @@ tools: Read, Grep, Glob, Bash, Write
 disallowedTools: Edit, Agent
 model: sonnet
 effort: medium
-maxTurns: 30
+maxTurns: 20
 color: red
 skills:
   - ponytail:ponytail-review

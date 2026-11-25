@@ -25,6 +25,8 @@ Delega en **tech-lead** con título, cuerpo y comentarios; su spec queda en `han
 ## 2. Implementación
 Según `Asignación`: **backend-dev** y/o **frontend-dev** con la ruta del spec (incluye su línea `Skills:`). Si es "ambos", primero backend (fija el contrato) y luego frontend.
 
+Si un dev responde empezando por `BLOQUEO` (o se agota su `maxTurns` sin handoff): ve directo al **Bloqueo** (abajo) y comenta en la issue la sección `BLOQUEO` de su handoff. No relances otro dev para lo mismo.
+
 ## 3. Revisión: una pasada y como máximo una corrección
 A qa, designer y reviewer pásales, además del spec, la rama base: la de la línea `Base:` de la issue, o `HEAD` si no hay.
 1. **Revisión única en paralelo**: lanza en un solo mensaje **qa**, **reviewer** y, si el diff toca frontend, **designer**. Nunca se relanzan.
