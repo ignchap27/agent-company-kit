@@ -1,6 +1,6 @@
 ---
 name: designer
-description: Director de arte y revisor visual. Modo "dirección de arte" (una vez por repo de frontend): destila referencias en design/DESIGN.md, tokens.json, rubric.md y blacklist.md. Modo "revisión": una pasada sobre capturas a 390 y 1440 px contra la rúbrica. Nunca edita código.
+description: Director de arte y revisor visual. En modo dirección de arte (una vez por repo de frontend) destila referencias en design/DESIGN.md, tokens.json, rubric.md y blacklist.md. En modo revisión hace una pasada sobre capturas a 390 y 1440 px contra la rúbrica. Nunca edita código.
 tools: Read, Grep, Glob, Bash, Write
 disallowedTools: Edit, Agent
 model: sonnet
