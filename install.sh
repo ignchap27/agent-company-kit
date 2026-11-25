@@ -6,13 +6,13 @@
 set -euo pipefail
 KIT="$(cd "$(dirname "$0")" && pwd)"
 for f in agents/tech-lead.md agents/backend-dev.md agents/frontend-dev.md agents/qa.md agents/reviewer.md agents/quality.md agents/designer.md agents/asistente.md \
-         skills/feature skills/run-issue skills/onboard-repo skills/frontend-design skills/frontend-craft skills/backend-craft skills/emil-design-eng skills/animate skills/animation-performance skills/break-ui skills/ux-heuristics skills/vercel-react-best-practices hooks/guard.sh hooks/require-green.sh agent-company; do
+         skills/feature skills/run-issue skills/onboard-repo skills/frontend-design skills/emil-design-eng skills/animate skills/animation-performance skills/break-ui skills/vercel-react-best-practices skills/modern-web-guidance hooks/guard.sh hooks/require-green.sh hooks/handoff-only.sh hooks/no-big-images.sh agent-company; do
   dst="$HOME/.claude/$f"
   mkdir -p "$(dirname "$dst")"
   if [ -e "$dst" ] && [ ! -L "$dst" ]; then echo "ya existe y no es un enlace, lo salto: $dst"; continue; fi
   ln -sfn "$KIT/home/.claude/$f" "$dst"
 done
-chmod +x "$KIT"/home/.claude/hooks/*.sh "$KIT"/home/.claude/agent-company/dispatch.sh "$KIT"/home/.claude/agent-company/merge-stacked.sh "$KIT"/home/.claude/agent-company/board/start.sh "$KIT"/home/.claude/agent-company/asistente.sh
+chmod +x "$KIT"/home/.claude/hooks/*.sh "$KIT"/home/.claude/agent-company/dispatch.sh "$KIT"/home/.claude/agent-company/merge-stacked.sh "$KIT"/home/.claude/agent-company/board/start.sh "$KIT"/home/.claude/agent-company/asistente.sh "$KIT"/home/.claude/agent-company/tokens.py
 
 load() {
   plist="$HOME/Library/LaunchAgents/$1.plist"
