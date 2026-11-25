@@ -4,6 +4,7 @@
 # Lo ejecuta launchd cada 10 min y /feature al crear una issue.
 set -uo pipefail
 export LC_ALL=en_US.UTF-8                     # launchd arranca con locale C; el slug necesita UTF-8
+unset CLAUDE_AUTOCOMPACT_PCT_OVERRIDE          # lo fija el asistente de Telegram (30%); no debe heredarlo cada sesión de issue
 STATE="$HOME/.claude/agent-company"
 ROOT="${AGENT_REPOS_DIR:-$HOME/Developer}"   # dónde viven (o se clonan) tus repos
 MAX="${AGENT_MAX_WIP:-2}"                     # sesiones de agentes simultáneas
