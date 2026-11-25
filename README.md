@@ -55,7 +55,6 @@ home/.claude/skills/run-issue/           /run-issue <n> → pipeline completo (l
 home/.claude/skills/onboard-repo/        /onboard-repo → CLAUDE.md + .claude/verify.sh vía PR
 home/.claude/skills/frontend-design/     skill oficial de Anthropic (Apache 2.0)
 home/.claude/skills/modern-web-guidance/ Google Chrome (Apache 2.0), copia fija; ver ORIGEN
-                                         Opcional: diseños propios (p. ej. de Claude Design) en <repo>/docs/referencias/<vista>.png → dev y designer los siguen; sin ellos, el pipeline sigue igual
 home/.claude/skills/{emil-design-eng,animate,animation-performance,break-ui}/  Emil Kowalski (MIT), copia fija; ver ORIGEN
 home/.claude/skills/vercel-react-best-practices/  Vercel (MIT), copia fija; ver ORIGEN
 (plugin) mattpocock-skills:tdd           precargado en backend-dev; frontend-dev lo carga si el spec lo pide
@@ -142,6 +141,22 @@ Si un merge falla (conflictos), la sub-issue queda `agent:blocked` y te avisa.
 Los PRs salen con tu usuario, y GitHub no deja aprobar formalmente un PR propio. Tu "aprobación" es revisar y hacer merge; lo que impide que lo haga un agente es:
 - `guard.sh` y las reglas `deny` de `bg-settings.json` (merge, review, push a la rama principal, force).
 - Opcional pero recomendado en cada repo: ruleset o branch protection con "Require a pull request" + "Require status checks" + bloqueo de force-push, **sin** exigir aprobaciones (tú no puedes darte una). Así tampoco cuela un push directo a main.
+
+## Diseño frontend
+
+Sin agentes nuevos: el `designer` hace de director de arte **una vez por repo**.
+1. Tú curas referencias: por proyecto en `<repo>/design/refs/` (3–5 capturas ≤ 1600 px + `notes.md`: qué te gusta y qué no copiar), o en general en `design-library/` de este kit (mismo formato, etiquetas en el nombre).
+2. En la primera issue `normal` de frontend sin `design/DESIGN.md`, el designer las redimensiona (≤ 768 px), mezcla principios de ≥ 3 + una firma propia y escribe `design/DESIGN.md` (≤ 1.500 tokens), `tokens.json`, `rubric.md` (8–10 criterios 1–5) y `blacklist.md`.
+3. `frontend-dev` solo lee esos archivos (+ `frontend-design` y `emil-design-eng`), nunca las referencias, y hace un ciclo de capturas a 390 y 1440 px contra la rúbrica: máximo 3 iteraciones y se congela.
+4. El designer revisa una vez con la misma rúbrica. Lo de la blacklist cuenta como `high`.
+
+Hook `no-big-images.sh`: ningún agente con capturas abre imágenes de más de 1600 px.
+
+## Handoffs, triage y parada
+
+- Cada subagente escribe `handoff/<n>-<agente>.md` en el worktree (fuera de git) y devuelve la ruta + ≤ 5 líneas; el orquestador pasa rutas, no textos. Los agentes de solo lectura solo pueden escribir ahí (`handoff-only.sh`).
+- El tech-lead marca la issue `chica` (fix acotado, una página) o `normal`. `chica`: un dev + gates deterministas (verify), sin revisores LLM. `normal`: gates, luego una pasada qa/reviewer/designer.
+- Los devs paran tras 3 intentos fallidos sobre el mismo error y escriben `BLOQUEO` en su handoff → `agent:blocked`.
 
 ## Costos
 
