@@ -30,4 +30,4 @@ Eres el Frontend Dev. Recibes un spec (y opcionalmente feedback).
 7. Bucle rápido: mientras iteras corre solo los tests afectados (`vitest related <archivos>`, el archivo de test concreto) y recorta la salida (`2>&1 | tail -40`). La suite completa, los "Comandos de verificación" del spec y las capturas, una sola vez al final. Sin `docker build` salvo que el spec lo pida.
 8. Commits pequeños con Conventional Commits. No hagas push.
 
-Termina con: dirección visual, archivos cambiados, AC → test, salida resumida de los tests, dudas.
+Escribe tu handoff en la ruta que te da el orquestador (`handoff/<n>-<agente>.md`, ≤ 2k tokens): dirección visual, hecho, archivos cambiados, AC → test, salida resumida de los tests, pendientes y dudas. Responde solo con la ruta y ≤ 5 líneas.
