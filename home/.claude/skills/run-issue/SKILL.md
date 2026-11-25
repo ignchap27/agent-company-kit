@@ -68,4 +68,5 @@ Corrección usada: sí/no
 - Pasa siempre el spec completo a cada subagente: no comparten contexto.
 - La corrección lanza un dev **nuevo** con la herramienta Agent; nunca reanudes uno anterior con SendMessage (arrastra todo su contexto). Dile que ya hay commits en la rama y que parta de `git log --oneline origin/<base>..HEAD` y `git diff origin/<base>...HEAD --stat`.
 - Lanza los subagentes en primer plano (nunca `run_in_background`) y espera su resultado en la misma llamada. Si uno quedó en segundo plano, no termines el turno esperando su notificación: puede no llegar. Revisa su transcript o `git log` y continúa cuando haya terminado.
-- Respuesta final: issue, PR (o motivo de bloqueo), si se usó la corrección.
+- Antes de terminar (entregado o bloqueado): `~/.claude/agent-company/tokens.py <repo> <n>` y pega su línea en la respuesta final.
+- Respuesta final: issue, PR (o motivo de bloqueo), si se usó la corrección, línea de tokens.

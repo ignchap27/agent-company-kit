@@ -156,6 +156,8 @@ Cambios que salieron de ahí:
 
 Resultado al relanzar la issue 4 con el pipeline nuevo: **$2,71 frente a ~$15**, 0 correcciones, PR listo. Ahora el mayor gasto es el orquestador (54 %).
 
+**Registro por fase:** `~/.claude/agent-company/tokens.py [<repo> <n>]` suma el coste (precio API, para comparar) de los transcripts de cada issue por fase (planificar = tech-lead, codear = devs, revisar = qa/reviewer/designer/quality, orquestar = sesión principal) y añade una línea a `agent-company/tokens.log`. `run-issue` lo llama al terminar. Línea base (2026-11-24, pipeline viejo): portfolio #1 ~$18, #3 ~$9, #4 ~$9, #7 ~$7, #9 ~$0,5.
+
 Palancas: `AGENT_MAX_WIP` (2 por defecto), `maxTurns` en cada agente, una sola corrección. Si tienes usage credits activos, ponles un límite mensual en claude.ai/settings/usage ([doc](https://code.claude.com/docs/en/costs)).
 
 ## Plan

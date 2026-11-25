@@ -2,3 +2,4 @@ home/.claude/agent-company/sonar/token
 home/.claude/agent-company/sonar/admin-password
 __pycache__/
 .claude/scheduled_tasks.lock
+home/.claude/agent-company/tokens.log
