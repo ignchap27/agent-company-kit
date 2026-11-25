@@ -28,9 +28,14 @@ Según `Asignación`: **backend-dev** y/o **frontend-dev** con la ruta del spec 
 Si un dev responde empezando por `BLOQUEO` (o se agota su `maxTurns` sin handoff): ve directo al **Bloqueo** (abajo) y comenta en la issue la sección `BLOQUEO` de su handoff. No relances otro dev para lo mismo.
 
 ## 3. Revisión: una pasada y como máximo una corrección
+**Gates deterministas primero**: corre tú los "Comandos de verificación" del spec (o `.claude/verify.sh`), recortando la salida (`2>&1 | tail -50`). Rojo → gasta ahí la única corrección (dev nuevo con el error) y, si sigue rojo, **Bloqueo**.
+
+**Complejidad `chica`**: con los gates en verde no lances qa, reviewer ni designer; salta al paso 4. El dueño revisa el PR.
+
+**Complejidad `normal`**:
 A qa, designer y reviewer pásales, además del spec, la rama base: la de la línea `Base:` de la issue, o `HEAD` si no hay.
 1. **Revisión única en paralelo**: lanza en un solo mensaje **qa**, **reviewer** y, si el diff toca frontend, **designer**. Nunca se relanzan.
-2. Si alguno trae hallazgos `high` (o qa `fail`): junta en **un solo** feedback por área solo esos `high` y lanza **un dev nuevo** por área con la ruta del spec y las de los handoffs de revisión, diciéndole que corrija solo los `high`. Es la única corrección. Todo `medium`/`low` va directo al PR en "Pendientes" para el dueño; nunca se corrige en el pipeline.
+2. Si alguno trae hallazgos `high` (o qa `fail`): junta en **un solo** feedback por área solo esos `high` y lanza **un dev nuevo** por área con la ruta del spec y las de los handoffs de revisión, diciéndole que corrija solo los `high`. Es la única corrección (si ya se gastó en los gates, los `high` van al PR al principio de "Pendientes", marcados ⚠). Todo `medium`/`low` va directo al PR en "Pendientes" para el dueño; nunca se corrige en el pipeline.
 3. Tras la corrección no relances revisores: corre tú los "Comandos de verificación" del spec (o `.claude/verify.sh`), recortando la salida. Rojo → bloqueo (abajo).
 4. Si hay capturas nuevas: `git add -f docs/capturas && git commit -m "docs: capturas de #<n>"`.
 5. `git push -u origin HEAD` y abre el PR en borrador:
